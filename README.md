@@ -101,7 +101,7 @@ This project is free and open-source. Use responsibly — this is for educationa
 - Add album support
 - GUI version?
 
-## Improvements
+## Improvements (Release 1.1.1.1)
 
 - In this updated version we have added support to download single track. Now --track option works.
 - Some Code improvements. Improved DRY Principle, made Code more reusable, encapsulated some filtering processes in functions, Code is cleaner and more readable
