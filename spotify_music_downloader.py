@@ -16,20 +16,14 @@ import sys
 # total
 # playlists = sp.playlist_items(playlist_id=playlist_id, limit=100, offset=100)
 
-client_id = "CLIENT_ID"
-client_secret = "CLIENT_SECRET"
+client_id = "42092746c07640b8a02ec0080a39fdd8"
+client_secret = "0bfd04cde7624ecd8ce3634c9cb2b596"
 
 # Authorize with Spotify
 auth_manager = SpotifyClientCredentials(
     client_id=client_id, client_secret=client_secret
 )
 sp = spotipy.Spotify(auth_manager=auth_manager)
-
-tracks = []
-filtered_tracks = []
-yt_queries = []
-urls = []
-path = []
 
 
 # Function for filtering objects
@@ -58,9 +52,10 @@ def build_yt_query(obj):
 
 
 # Function to get data of ONE track
-def get_track(id, sp):
-    track = sp.track(id=id)
-    return None
+def get_track(track_id, sp):
+    track = sp.track(track_id)
+
+    return track
 
 
 # iterating/looping till we get all the tracks from the playlist because 100 is the max amount of tracks we can fetch/request
@@ -104,18 +99,51 @@ def download_track(query, path):
         ydl.download([f"ytsearch1:{query}"])
 
 
+def filter_process(track, keys_to_leave=["name"]):
+    buffer_obj = {"track": "", "artists": []}
+    name = filter_obj(track, keys_to_leave).get("name")
+    if name:
+        buffer_obj["track"] = name
+
+    for artist in track["artists"]:
+        name = filter_obj(artist, keys_to_leave).get("name")
+        if name:
+            buffer_obj["artists"].append(name)
+
+    return buffer_obj
+
+
 # Filter Tracks
-def filter_tracks(tracks):
+def filter_tracks(tracks, download_type="playlist"):
     # Specific to only track Object
     filtered_tracks = []
 
-    for item in tracks:
-        track = item["track"]
-        if not track:
-            continue
+    if download_type == "playlist":
+        for item in tracks:
+            track = item["track"]
+            if not track:
+                continue
 
+            buffer_obj = {"track": "", "artists": []}
+            name = filter_obj(track, ["name"]).get("name")
+
+            if name:
+                buffer_obj["track"] = name
+
+            for artist in track["artists"]:
+                name = filter_obj(artist, ["name"]).get("name")
+                if name:
+                    buffer_obj["artists"].append(name)
+
+            filtered_tracks.append(buffer_obj)
+
+        return filtered_tracks
+
+    if download_type == "track":
+        track = tracks[0]
         buffer_obj = {"track": "", "artists": []}
         name = filter_obj(track, ["name"]).get("name")
+
         if name:
             buffer_obj["track"] = name
 
@@ -124,9 +152,9 @@ def filter_tracks(tracks):
             if name:
                 buffer_obj["artists"].append(name)
 
-        filtered_tracks.append(buffer_obj)
+        return buffer_obj
 
-    return filtered_tracks
+    return None
 
 
 def loop_over_tracks_to_build_query(tracks):
@@ -143,13 +171,13 @@ def loop_over_queries_and_download_tracks(yt_queries, path):
         print(f"#{i} | {query} has downloaded successfully ✅")
 
 
-def determine_option_and_execute(option, id=""):
+def determine_option_and_execute(option, id, path="./"):
     if option == "--help":
         print(
             """
 Free and Easy to use tool, Spotify Downloader is a tool for downloading tracks and playlists from spotify without any complications or inconveniences.
 
-Usage: spotidownload <?options>
+Usage: spotidownload <?options> <?path>
 
 Informative options:
     --help                                          Display this help message and the options
@@ -162,7 +190,19 @@ General Options:
         )
         return None
     elif option == "--track":
-        # Feature would be added in later releases
+        track = get_track(id, sp)
+        print("Fetching the track... ✅")
+
+        filtered_track = filter_tracks([track], "track")
+        print("Filtering the Data for it to be readable... ✅")
+        print(filtered_track)
+
+        yt_query = build_yt_query(filtered_track)
+        print("Building the Youtube Query... ✅")
+
+        print("Downloading Track... ✅")
+        download_track(yt_query, path)
+
         return None
     elif option == "--playlist":
         tracks = get_all_tracks(id, sp)
@@ -184,20 +224,21 @@ General Options:
 
 def main():
     option = sys.argv[1]
-    track_playlist_id = ""
+    spotify_id = ""
+    path = "./"
 
     if option != "--help":
         if len(sys.argv) < 4:
             raise ValueError(
                 "Playlist/Track URL or Output Path wasn't specified or is invalid!"
             )
-        track_playlist_id = sys.argv[2]
+        spotify_id = sys.argv[2]
         path = sys.argv[3]
     else:
         determine_option_and_execute(option)
         return None
 
-    determine_option_and_execute(option, track_playlist_id)
+    determine_option_and_execute(option, spotify_id, path)
     return None
 
 
