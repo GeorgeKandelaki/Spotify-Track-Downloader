@@ -222,7 +222,7 @@ General Options:
 
         tracks_obj = get_all_tracks(playlist_id, sp, offset)
 
-        if tracks_obj["total_tracks"]:
+        if offset > tracks_obj["total_tracks"]:
             raise ValueError(
                 "".join(
                     [
@@ -233,11 +233,10 @@ General Options:
                 )
             )
 
-        else:
+        if not tracks_obj["tracks"]:
             raise ValueError("Playlist couldn't be found :(")
 
         print("Fetching all tracks... ✅")
-
         filtered_tracks = filter_tracks(tracks_obj["tracks"])
         print("Filtering the Data for it to be readable... ✅")
 
