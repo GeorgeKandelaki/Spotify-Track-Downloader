@@ -171,12 +171,18 @@ def determine_option_and_execute(options, client_id="", client_secret=""):
         print(HELP_STR)
         return None
 
+    if "--save_credentials" in options:
+        credentials.save_credentials(
+            CONFIG_FILE_NAME, options["--client_secret"], options["--client_id"]
+        )
+        user_credentials = credentials.get_credentials(CONFIG_PATH)
+
     if (
         not "--client_id" in options or not "--client_secret" in options
     ) and not user_credentials:
         raise ValueError("You have to specify client secret and id to download tracks!")
     else:
-        if user_credentials:
+        if user_credentials["client_secret"] and user_credentials["client_id"]:
             client_id = user_credentials["client_id"]
             client_secret = user_credentials["client_secret"]
         else:
@@ -190,9 +196,6 @@ def determine_option_and_execute(options, client_id="", client_secret=""):
         )
 
         sp = spotipy.Spotify(auth_manager=auth_manager)
-
-    if "--save_credentials" in options:
-        credentials.save_credentials(CONFIG_FILE_NAME, client_secret, client_id)
 
     if "--path" in options:
         output_path = options["--path"]
