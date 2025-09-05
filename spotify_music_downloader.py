@@ -158,9 +158,11 @@ def loop_over_queries_and_download_tracks(yt_queries, path="./"):
 
 
 def determine_option_and_execute(options, client_id="", client_secret=""):
-    credentials.save_credentials(
-        CONFIG_FILE_NAME, DEFAULT_CLIENT_SECRET, DEFAULT_CLIENT_ID
-    )
+    if "--use_default_credentials" in options:
+        credentials.save_credentials(
+            CONFIG_FILE_NAME, DEFAULT_CLIENT_SECRET, DEFAULT_CLIENT_ID
+        )
+
     output_path = "./"
     offset = 0
     user_credentials = credentials.get_credentials(CONFIG_PATH)
@@ -267,6 +269,9 @@ def main():
 
     if "--save_credentials" in options_arr:
         options["--save_credentials"] = None
+
+    if "--use_default_credentials" in options_arr:
+        options["--use_default_credentials"] = None
 
     # print(sys.argv) OUTPUT <- ['spotidownload.py', '--playlist', '17kf5gMvi1Pm5A0B6NO0t1', './musics']
 
