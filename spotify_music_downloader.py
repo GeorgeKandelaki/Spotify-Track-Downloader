@@ -2,22 +2,14 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import yt_dlp
 import os, sys
-from pathlib import Path
-from pprint import pprint
-import sys
-
-
 from utils import filter_obj, filtering_track_process, convert_arr_into_obj
+import credentials
 
-# Playlist Objects keys/properties returned from `playlist_items` method
-# href
-# items
-# limit
-# next
-# offset
-# previous
-# total
-
+from constants import (
+    CONFIG_FILE_NAME,
+    CONFIG_PATH,
+    HELP_STR,
+)
 
 client_id = ""
 client_secret = ""
@@ -135,6 +127,7 @@ def filter_tracks(tracks, download_type="playlist"):
     return None
 
 
+# Build youtube queries
 def loop_over_tracks_to_build_query(tracks):
     yt_queries = []
     for track in tracks:
@@ -143,42 +136,33 @@ def loop_over_tracks_to_build_query(tracks):
     return yt_queries
 
 
+# Simply looping over queries and downloading tracks
 def loop_over_queries_and_download_tracks(yt_queries, path="./"):
     for i, query in enumerate(yt_queries):
         download_track(query, path)
         print(f"#{i} | {query} has downloaded successfully ✅")
 
 
-def determine_option_and_execute(options):
-    path = "./"
+# Main function for executing the whole app. Basically "Parses/Processes" the options and executes the corresponding actions
+def determine_option_and_execute(options, client_id="", client_secret=""):
+    output_path = "./"
     offset = 0
+    user_credentials = credentials.get_credentials(CONFIG_PATH)
 
     if "--help" in options:
-        print(
-            """
-Free and Easy to use tool, Spotify Downloader is a tool for downloading tracks and playlists from spotify without any complications or inconveniences.
-
-Usage: spotidownload <?options> <?path>
-
-Informative options:
-    --help                                          Display this help message and the options
-
-General Options:
-    --track <?track_id>                             Download one singular track
-    --playlist <?playlist_id>                       Download all the track from the playlist
-    --path <?download_dir>                          Specifying Path/Dir/Route for storing/saving tracks | DEFAULT CURRENT DIR
-    --offset <?index>                               From which index of the playlist to download | DEFAULT 0
-    --client_id <?client_id>                        Spotify's client ID | NECESSARY 
-    --client_secret <?client_secret>                Spotify's client secret | NECESSARY
-
-"""
-        )
-
+        print(HELP_STR)
         return None
 
-    if "--client_id" not in options and "--client_secret" not in options:
+    if (
+        not "--client_id" in options or not "--client_secret" in options
+    ) and not user_credentials:
         raise ValueError("You have to specify client secret and id to download tracks!")
     else:
+        if user_credentials:
+            client_id = user_credentials["client_id"]
+            client_secret = user_credentials["client_secret"]
+
+        # Get the damn credentials
         client_id = options["--client_id"]
         client_secret = options["--client_secret"]
 
@@ -189,8 +173,11 @@ General Options:
 
         sp = spotipy.Spotify(auth_manager=auth_manager)
 
+    if "--save_credentials" in options:
+        credentials.save_credentials(CONFIG_FILE_NAME, client_secret, client_id)
+
     if "--path" in options:
-        path = options["--path"]
+        output_path = options["--path"]
 
     if "--offset" in options:
         offset = int(options["--offset"])
@@ -213,7 +200,7 @@ General Options:
         print("Building the Youtube Query... ✅")
 
         print("Downloading Track... ✅")
-        download_track(yt_query, path)
+        download_track(yt_query, output_path)
 
         return None
 
@@ -237,6 +224,7 @@ General Options:
             raise ValueError("Playlist couldn't be found :(")
 
         print("Fetching all tracks... ✅")
+
         filtered_tracks = filter_tracks(tracks_obj["tracks"])
         print("Filtering the Data for it to be readable... ✅")
 
@@ -244,7 +232,7 @@ General Options:
         print("Building the Youtube Queries... ✅")
 
         print("Downloading Tracks... ✅")
-        loop_over_queries_and_download_tracks(yt_queries, path)
+        loop_over_queries_and_download_tracks(yt_queries, output_path)
 
         return None
 
@@ -258,12 +246,15 @@ def main():
     options = convert_arr_into_obj(options_arr)
     # print(options)
 
-    if len(options_arr) == 1:
+    if "--help" in options_arr:
         options["--help"] = None
+
+    if "--save_credentials" in options_arr:
+        options["--save_credentials"] = None
 
     # print(sys.argv) OUTPUT <- ['spotidownload.py', '--playlist', '17kf5gMvi1Pm5A0B6NO0t1', './musics']
 
-    determine_option_and_execute(options)
+    determine_option_and_execute(options, client_id, client_secret)
     return None
 
 

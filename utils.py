@@ -24,24 +24,6 @@ def filtering_track_process(track, keys_to_leave=None):
     return buffer_obj
 
 
-# V1
-# def convert_arr_into_obj(arr):
-#     # Only for the arrays which are structured in this style [key,value,...]
-#     obj = {}
-#     i = 0
-
-#     for key in arr:
-#         if i % 2 == 0 and i < len(arr):
-#             i += 1
-#             obj[key] = arr[i]
-#         else:
-#             i += 1
-#             continue
-
-#     return obj
-
-
-# V2
 def convert_arr_into_obj(arr):
     # Only for arrays structured like [key, value, key, value, ...]
     obj = {}
