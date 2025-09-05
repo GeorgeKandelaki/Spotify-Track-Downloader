@@ -7,6 +7,8 @@ import credentials
 
 from constants import (
     CONFIG_FILE_NAME,
+    DEFAULT_CLIENT_ID,
+    DEFAULT_CLIENT_SECRET,
     CONFIG_PATH,
     HELP_STR,
 )
@@ -159,6 +161,9 @@ def determine_option_and_execute(options, client_id="", client_secret=""):
     output_path = "./"
     offset = 0
     user_credentials = credentials.get_credentials(CONFIG_PATH)
+    credentials.save_credentials(
+        CONFIG_FILE_NAME, DEFAULT_CLIENT_SECRET, DEFAULT_CLIENT_ID
+    )
 
     if "--help" in options:
         print(HELP_STR)
