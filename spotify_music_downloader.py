@@ -158,12 +158,12 @@ def loop_over_queries_and_download_tracks(yt_queries, path="./"):
 
 
 def determine_option_and_execute(options, client_id="", client_secret=""):
-    output_path = "./"
-    offset = 0
-    user_credentials = credentials.get_credentials(CONFIG_PATH)
     credentials.save_credentials(
         CONFIG_FILE_NAME, DEFAULT_CLIENT_SECRET, DEFAULT_CLIENT_ID
     )
+    output_path = "./"
+    offset = 0
+    user_credentials = credentials.get_credentials(CONFIG_PATH)
 
     if "--help" in options:
         print(HELP_STR)
