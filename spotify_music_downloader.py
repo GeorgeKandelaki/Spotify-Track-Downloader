@@ -11,6 +11,20 @@ from constants import (
     HELP_STR,
 )
 
+# Playlist Objects keys/properties returned from `playlist_items` method
+# href
+# items
+# limit
+# next
+# offset
+# previous
+# total
+# playlists = sp.playlist_items(playlist_id=playlist_id, limit=100, offset=100)
+
+# client_id = "42092746c07640b8a02ec0080a39fdd8"
+# client_secret = "0bfd04cde7624ecd8ce3634c9cb2b596"
+
+
 client_id = ""
 client_secret = ""
 sp = {}
@@ -127,7 +141,6 @@ def filter_tracks(tracks, download_type="playlist"):
     return None
 
 
-# Build youtube queries
 def loop_over_tracks_to_build_query(tracks):
     yt_queries = []
     for track in tracks:
@@ -136,14 +149,12 @@ def loop_over_tracks_to_build_query(tracks):
     return yt_queries
 
 
-# Simply looping over queries and downloading tracks
 def loop_over_queries_and_download_tracks(yt_queries, path="./"):
     for i, query in enumerate(yt_queries):
         download_track(query, path)
         print(f"#{i} | {query} has downloaded successfully ✅")
 
 
-# Main function for executing the whole app. Basically "Parses/Processes" the options and executes the corresponding actions
 def determine_option_and_execute(options, client_id="", client_secret=""):
     output_path = "./"
     offset = 0
@@ -161,10 +172,10 @@ def determine_option_and_execute(options, client_id="", client_secret=""):
         if user_credentials:
             client_id = user_credentials["client_id"]
             client_secret = user_credentials["client_secret"]
-
-        # Get the damn credentials
-        client_id = options["--client_id"]
-        client_secret = options["--client_secret"]
+        else:
+            # Get the damn credentials
+            client_id = options["--client_id"]
+            client_secret = options["--client_secret"]
 
         # Authorize with Spotify
         auth_manager = SpotifyClientCredentials(

@@ -20,4 +20,5 @@ General Options:
 USER_HOME = os.path.expanduser("~")
 CONFIG_FILE_NAME = "spotidownload"
 BASE_CONFIG_PATH = f"{USER_HOME}/.config"
-CONFIG_PATH = f"{BASE_CONFIG_PATH}/spotidownload/{CONFIG_FILE_NAME}"
+CONFIG_DIR = f"{USER_HOME}/spotidownload"
+CONFIG_PATH = f"{BASE_CONFIG_PATH}/spotidownload/{CONFIG_FILE_NAME}.py"
