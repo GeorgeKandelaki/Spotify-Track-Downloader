@@ -101,7 +101,7 @@ This project is free and open-source. Use responsibly — this is for educationa
 - Add album support
 - GUI version?
 
-## Improvements (Release 1.2.0.0)
+## Improvements (Release 1.3.0.0)
 
 - In this updated version we have added support to download single track. Now --track option works.
 - Some Code improvements. Improved DRY Principle, made Code more reusable, encapsulated some filtering processes in functions, Code is cleaner and more readable
@@ -109,3 +109,5 @@ This project is free and open-source. Use responsibly — this is for educationa
 - Improved Error Handling.
 - Added features to specify offset.
 - Also added options for users to specify their own client secret and id.
+- Added feature for saving the credentials of the user (client_id, client_secret)
+- Improved Code a lot: Cleaner, Better Readability, "DRIER", improved Reusability, also a lot of abstractions and optimizations were made in the Code.
